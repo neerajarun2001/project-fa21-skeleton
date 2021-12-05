@@ -8,8 +8,34 @@ def solve(tasks):
     Returns:
         output: list of igloos in order of polishing  
     """
-    return [1]
-    pass
+    output = []
+    time = 0
+    best_id = 0
+    best_pos = 0
+    list_pos = 0
+    best_profit = 0
+    while time < 1440:
+        for task in tasks:
+            benefit = task.calc_benefit_from_now(time)
+            if benefit > best_profit:
+                best_profit = benefit
+                best_id = task.get_task_id()
+                best_pos = list_pos
+            elif benefit == best_profit:
+                prev_best_deadline = tasks[best_pos].get_deadline()
+                new_best_deadline = task.get_deadline()
+                if new_best_deadline < prev_best_deadline:
+                    best_profit = benefit
+                    best_id = task.get_task_id()
+                    best_pos = list_pos
+            list_pos += 1
+        output.append(tasks[best_pos])
+        time += tasks[best_pos].get_duration()
+        best_id = 0
+        best_pos = 0
+        list_pos = 0
+        best_profit = 0
+    return output
 
 
 # Here's an example of how to run your solver.
