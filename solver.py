@@ -2,6 +2,33 @@ from parse import read_input_file, write_output_file
 import os
 from functools import cmp_to_key
 
+def knap(cap, tasks):
+    t_quantity = len(tasks)
+    P = [[0 for x in range(cap+1)] for x in range(t_quantity)]
+    T = [[[] for x in range(cap+1)] for x in range(t_quantity)]
+    t_durations = [t.get_duration() for t in tasks]
+
+    for i in range(t_quantity):
+        for d in range(cap+1):
+            if i == 0 or d == 0:
+                P[i][d] = 0
+            elif t_durations[i-1] <= cap:
+                v_i = tasks[i-1].calc_benefit_from_now(t_durations[i-1]) 
+                max_with_t = P[i-1][d-t_durations[i-1]]
+                max_prev = P[i-1][d]
+                if v_i + max_with_t > max_prev:
+                    P[i][d] = v_i + max_with_t
+                    try:
+                        T[i][d].append(tasks[i].get_task_id())
+                    except IndexError:
+                        print(i, d, len(T), len(T[0]), len(tasks))
+                else:
+                    P[i][d] = max_prev
+            else:
+                P[i][d] = P[i-1][d]
+
+    return T[t_quantity-1][cap]
+
 def solve_shitty_naive(tasks):
     """
     Args:
@@ -48,8 +75,6 @@ def sort_by_deadline(tasks):
 def deadline_comparator(task1, task2):
     return task1.deadline < task2.deadline
 
-
-# Here's an example of how to run your solver.
 if __name__ == '__main__':
     for size in os.listdir('inputs/'):
         if size not in ['small', 'medium', 'large']:
@@ -61,5 +86,6 @@ if __name__ == '__main__':
             output_path = 'outputs/{}/{}.out'.format(size, input_file[:-3])
             print(input_path, output_path)
             tasks = read_input_file(input_path)
-            output = solve_shitty_naive(tasks)
+            output = knap(1440, tasks)
+            # output = solve_shitty_naive(tasks)
             write_output_file(output_path, output)
