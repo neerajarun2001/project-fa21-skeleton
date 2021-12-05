@@ -13,7 +13,7 @@ def knap(cap, tasks):
             if i == 0 or d == 0:
                 P[i][d] = 0
             elif t_durations[i] <= cap:
-                elapsed_time = sum(T[i-1][d], key=lambda t: t.get_duration())
+                elapsed_time = sum([t.get_duration() for t in T[i-1][d]])
                 v_i = tasks[i].calc_benefit_from_now(elapsed_time)
                 max_with_t = P[i-1][d-tasks[i].get_duration()]
                 max_prev = P[i-1][d]
