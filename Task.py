@@ -85,6 +85,17 @@ class Task:
         minutes_late = max(0, minutes_late)
         return self.get_max_benefit() * math.exp(-0.0170 * minutes_late)
 
+    def calc_benefit_from_now(self, time: int):
+        """
+        Returns the benefit received from completing this task starting
+        at the current time ticker
+        """
+        finish_time = time + self.duration
+        if finish_time <= self.deadline:
+            return self.get_max_benefit()
+        else:
+            return self.get_late_benefit(finish_time - self.deadline)
+
     def __str__(self):
         """
         Generates a readable string representation of a task
