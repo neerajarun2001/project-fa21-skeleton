@@ -35,6 +35,7 @@ def solve(tasks):
         best_pos = 0
         list_pos = 0
         best_profit = 0
+    output.pop()
     return output
 
 
