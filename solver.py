@@ -18,12 +18,14 @@ def knap(cap, tasks):
                 max_prev = P[i-1][d]
                 if v_i + max_with_t > max_prev:
                     P[i][d] = v_i + max_with_t
-                    try:
-                        T[i][d].append(tasks[i].get_task_id())
-                    except IndexError:
-                        print(i, d, len(T), len(T[0]), len(tasks))
+                    # try:
+                    T[i][d] = T[i-1][d]
+                    T[i][d].append(tasks[i].get_task_id())
+                    #except IndexError:
+                    #    print(i, d, len(T), len(T[0]), len(tasks))
                 else:
                     P[i][d] = max_prev
+                    T[i][d] = T[i-1][d]
             else:
                 P[i][d] = P[i-1][d]
 
