@@ -12,15 +12,16 @@ def knap(cap, tasks):
         for d in range(cap+1):
             if i == 0 or d == 0:
                 P[i][d] = 0
-            elif t_durations[i-1] <= cap:
-                v_i = tasks[i-1].calc_benefit_from_now(t_durations[i-1]) 
-                max_with_t = P[i-1][d-t_durations[i-1]]
+            elif t_durations[i] <= cap:
+                elapsed_time = sum(T[i-1][d], key=lambda t: t.get_duration())
+                v_i = tasks[i].calc_benefit_from_now(elapsed_time)
+                max_with_t = P[i-1][d-tasks[i].get_duration()]
                 max_prev = P[i-1][d]
-                if v_i + max_with_t > max_prev:
+                if v_i + max_with_t > max_prev and elapsed_time + tasks[i].get_duration() <= cap:
                     P[i][d] = v_i + max_with_t
                     # try:
                     T[i][d] = T[i-1][d]
-                    T[i][d].append(tasks[i].get_task_id())
+                    T[i][d].append(tasks[i])
                     #except IndexError:
                     #    print(i, d, len(T), len(T[0]), len(tasks))
                 else:
@@ -29,7 +30,8 @@ def knap(cap, tasks):
             else:
                 P[i][d] = P[i-1][d]
 
-    return T[t_quantity-1][cap]
+    ret = T[t_quantity-1][cap]
+    return [t.get_task_id() for t in ret]
 
 def solve_shitty_naive(tasks):
     """
