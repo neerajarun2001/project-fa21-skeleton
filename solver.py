@@ -9,8 +9,35 @@ def solve(tasks):
     Returns:
         output: list of igloos in order of polishing  
     """
-    return [1]
-    pass
+    output = []
+    time = 0
+    best_id = 0
+    best_pos = 0
+    list_pos = 0
+    best_profit = 0
+    while time < 1440:
+        for task in tasks:
+            benefit = task.calc_benefit_from_now(time)
+            if benefit > best_profit:
+                best_profit = benefit
+                best_id = task.get_task_id()
+                best_pos = list_pos
+            elif benefit == best_profit:
+                prev_best_deadline = tasks[best_pos].get_deadline()
+                new_best_deadline = task.get_deadline()
+                if new_best_deadline < prev_best_deadline:
+                    best_profit = benefit
+                    best_id = task.get_task_id()
+                    best_pos = list_pos
+            list_pos += 1
+        output.append(tasks[best_pos])
+        time += tasks[best_pos].get_duration()
+        best_id = 0
+        best_pos = 0
+        list_pos = 0
+        best_profit = 0
+    output.pop()
+    return output
 
 def sort_by_deadline(tasks):
     return sorted(tasks, key=cmp_to_key(deadline_comparator))
@@ -20,16 +47,16 @@ def deadline_comparator(task1, task2):
 
 
 # Here's an example of how to run your solver.
-# if __name__ == '__main__':
-#     for size in os.listdir('inputs/'):
-#         if size not in ['small', 'medium', 'large']:
-#             continue
-#         for input_file in os.listdir('inputs/{}/'.format(size)):
-#             if size not in input_file:
-#                 continue
-#             input_path = 'inputs/{}/{}'.format(size, input_file)
-#             output_path = 'outputs/{}/{}.out'.format(size, input_file[:-3])
-#             print(input_path, output_path)
-#             tasks = read_input_file(input_path)
-#             output = solve(tasks)
-#             write_output_file(output_path, output)
+if __name__ == '__main__':
+    for size in os.listdir('inputs/'):
+        if size not in ['small', 'medium', 'large']:
+            continue
+        for input_file in os.listdir('inputs/{}/'.format(size)):
+            if size not in input_file:
+                continue
+            input_path = 'inputs/{}/{}'.format(size, input_file)
+            output_path = 'outputs/{}/{}.out'.format(size, input_file[:-3])
+            print(input_path, output_path)
+            tasks = read_input_file(input_path)
+            output = solve(tasks)
+            write_output_file(output_path, output)
