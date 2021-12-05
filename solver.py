@@ -1,5 +1,6 @@
 from parse import read_input_file, write_output_file
 import os
+from functools import cmp_to_key
 
 def solve_shitty_naive(tasks):
     """
@@ -40,6 +41,12 @@ def solve_shitty_naive(tasks):
         best_profit = 0
     output.pop()
     return output
+
+def sort_by_deadline(tasks):
+    return sorted(tasks, key=cmp_to_key(deadline_comparator))
+
+def deadline_comparator(task1, task2):
+    return task1.deadline < task2.deadline
 
 
 # Here's an example of how to run your solver.
