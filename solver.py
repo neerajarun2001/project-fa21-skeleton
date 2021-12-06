@@ -3,6 +3,13 @@ import os
 from functools import cmp_to_key
 
 def knap(cap, tasks):
+    max_duration = 60
+    max_benefit = 100
+    #print([t.get_max_benefit() for t in tasks])
+    tasks.sort(key=lambda t: (t.get_max_benefit() / max_benefit + (1 - t.get_duration() / max_duration) + (1 - t.get_deadline() / cap)), reverse=True)
+    #print([t.get_max_benefit() for t in tasks])
+
+
     t_quantity = len(tasks)
     P = [[0 for x in range(cap+1)] for x in range(t_quantity)]
     T = [[[] for x in range(cap+1)] for x in range(t_quantity)]
