@@ -96,6 +96,10 @@ class Task:
         else:
             return self.get_late_benefit(finish_time - self.deadline)
 
+    def calc_start(self):
+        start = self.get_deadline() - self.get_duration()
+        return start
+
     def __str__(self):
         """
         Generates a readable string representation of a task

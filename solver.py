@@ -40,6 +40,115 @@ def knap(cap, tasks):
     ret = T[t_quantity-1][cap]
     return [t.get_task_id() for t in ret]
 
+
+
+def jobcomparator(task1, task2):
+    return task1.get_deadline() - task2.get_deadline()
+
+def findLastNonConflictingJob(tasks, n):
+    # search space
+    (low, high) = (0, n)
+ 
+    # iterate till the search space is exhausted
+    while low <= high:
+        mid = (low + high) // 2
+        if tasks[mid].get_deadline() <= tasks[n].calc_start():
+            if tasks[mid + 1].get_deadline() <= tasks[n].calc_start():
+                low = mid + 1
+            else:
+                return mid
+        else:
+            high = mid - 1
+ 
+    # return the negative index if no non-conflicting job is found
+    return -1
+
+def weightedjobsequencing(tasks):
+    output = []
+
+    # base case
+    if not tasks:
+        return 0
+ 
+    # sort tasks in increasing order of their deadlines
+    tasks.sort(key=lambda task: task.get_deadline())
+ 
+    # get the number of tasks
+    num_tasks = len(tasks)
+ 
+    # `maxProfit[i]` stores the maximum benefit possible for the first `i` tasks, and
+    # `tasks[i]` stores the index of tasks involved in the maximum benefit
+    maxBenefit = [None] * num_tasks
+    maxTasks = [[] for _ in range(num_tasks)]
+ 
+    # initialize `maxBenefit[0]` and `maxTasks[0]` with the first job
+    maxBenefit[0] = tasks[0].get_max_benefit()
+    maxTasks[0].append(0)
+ 
+    # fill `maxTasks[]` and `maxBenefit[]` in a bottom-up manner
+    for i in range(1, num_tasks):
+ 
+        # find the index of the last non-conflicting task with the current task
+        index = findLastNonConflictingJob(tasks, i)
+ 
+        # include the current tasks with its non-conflicting task
+        currBenefit = tasks[i].get_max_benefit()
+        if index != -1:
+            currBenefit += maxBenefit[index]
+ 
+        # if including the current task leads to the maximum benefit so far
+        if maxBenefit[i - 1] < currBenefit:
+            maxBenefit[i] = currBenefit
+ 
+            if index != -1:
+                maxTasks[i] = maxTasks[index][:]
+            maxTasks[i].append(i)
+ 
+        # excluding the current task leads to the maximum benefit so far
+        else:
+            maxTasks[i] = maxTasks[i - 1][:]
+            maxBenefit[i] = maxBenefit[i - 1]
+ 
+    for i in maxTasks[num_tasks - 1]:
+        output.append(tasks[i].get_task_id())
+
+    return output
+
+
+def final_dp_attempt(tasks):
+    output = []
+
+    # sort by deadline
+    tasks.sort(key=lambda task: task.get_deadline())
+    Matrix = [[None for x in range(1441)] for y in range(len(tasks)+1)]
+
+    for t in range(1441):
+        Matrix[0][t] = 0
+    
+    for i in range(len(tasks)):
+        for t in range(1441):
+            latestT = min(t, tasks[i].get_deadline()) - tasks[i].get_duration()
+            if latestT < 0:
+                Matrix[i+1][t] = Matrix[i][t]
+            else:
+                Matrix[i+1][t] = max(Matrix[i][t], tasks[i].get_max_benefit() + Matrix[i][latestT])
+
+    printOPT(len(tasks)-1, 1440, Matrix, tasks, output)
+    return output
+
+def printOPT(i, t, Matrix, tasks, output):
+    if i == 0:
+        return
+    if Matrix[i+1][t] == Matrix[i][t]:
+        printOPT(i-1, t, Matrix, tasks, output)
+    else:
+        latestT = min(t, tasks[i].get_deadline()) - tasks[i].get_duration()
+        printOPT(i-1, latestT, Matrix, tasks, output)
+        output.append(tasks[i].get_task_id())
+
+
+
+
 def solve_shitty_naive(tasks):
     """
     Args:
@@ -97,6 +206,6 @@ if __name__ == '__main__':
             output_path = 'outputs/{}/{}.out'.format(size, input_file[:-3])
             print(input_path, output_path)
             tasks = read_input_file(input_path)
-            output = knap(1440, tasks)
+            output = final_dp_attempt(tasks)
             # output = solve_shitty_naive(tasks)
             write_output_file(output_path, output)
