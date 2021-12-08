@@ -1,12 +1,17 @@
-PLAN:
+# CS170 Final Project
+Authors: Neeraj Arunkumar, Caroline Wu, Michael Wu
 
-Task 
-  id
-	deadline
-	duration
-	profit
+## How To Run
 
-Output
-  schedule to max profit in 1440 mins
+Run the solver.py file to generate the outputs:
+```bash
+python3 solver.py
+```
 
+To create the submission.json file for the outputs, run the following:
+```bash
+python3 prepare_submission.py outputs/ submission.json
+```
 
+## Project Spec
+[Berkeley CS170 Project](https://cs170.org/assets/pdf/project_spec.pdf)
